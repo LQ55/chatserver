@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="chat.dao.userDao.UserDao">
+
+	<insert id="saveUser" parameterType="chat.entity.user.User">
+		insert into
+		user(eid,no,pwd,nickname)
+		values(#{eid},#{no},#{pwd},#{nickname})
+	</insert>
+
+	<insert id="updateUser" parameterType="chat.entity.user.User">
+		update user
+		<set>
+			<if test="eid != null">user.eid=#{eid},</if>
+			<if test="no != null">user.no=#{no},</if>
+			<if test="pwd != null">user.pwd=#{pwd},</if>
+			<if test="nickname != null">user.nickname=#{nickname},</if>
+		</set>
+		where user.id=#{id}
+	</insert>
+
+	<resultMap type="chat.entity.user.User" id="resultListUser">
+		<id column="id" property="id" />
+		<result column="eid" property="eid" />
+		<result column="no" property="no" />
+		<result column="pwd" property="pwd" />
+		<result column="nickname" property="nickname" />
+	</resultMap>
+
+	<resultMap type="chat.entity.user.User" id="resultListUserWithMesSmall">
+		<id column="id" property="id" />
+		<result column="eid" property="eid" />
+		<result column="no" property="no" />
+		<result column="pwd" property="pwd" />
+		<result column="nickname" property="nickname" />
+	</resultMap>
+
+	<select id="findUserById" parameterType="Integer" resultMap="resultListUser">
+		SELECT * FROM user where user.id=#{id}
+	</select>
+
+	<select id="findUserByNo" resultMap="resultListUser">
+		SELECT * FROM user
+		where user.no=#{no}
+	</select>
+
+	<select id="getSearchPageList" resultMap="resultListUserWithMesSmall">
+		SELECT
+		user.id,
+		user.eid,
+		user.nickname,
+		user.no
+		FROM `user` where
+		user.eid like binary
+		#{searchCondition} or
+		user.nickname like binary
+		#{searchCondition} or
+		user.no like binary
+		#{searchCondition} 
+		limit #{startIndex},#{pageSize}
+	</select>
+	<select id="getSearchTotalItems" resultType="int">
+		SELECT count(1)
+		FROM
+		`user` where
+		user.eid like binary
+		#{searchCondition} or
+		user.nickname like binary
+		#{searchCondition} or
+		user.no like binary
+		#{searchCondition}
+	</select>
+</mapper>
